@@ -2,10 +2,10 @@ require("dotenv").config();
 
 // init project
 const express = require("express");
-const res = require("express/lib/response");
 const querystring = require("querystring");
-const app = express();
 const axios = require("axios");
+
+const app = express();
 const port = 8888;
 
 const CLIENT_ID = process.env.CLIENT_ID;
@@ -48,8 +48,7 @@ app.get("/login", (req, res) => {
   const state = generateRandomString(16);
   res.cookie(stateKey, state);
 
-  const scope =
-    "user-read-private user-read-email user-read-recently-played user-top-read user-follow-read user-follow-modify playlist-read-private playlist-read-collaborative playlist-modify-public";
+  const scope = "user-read-private user-read-email";
 
   const queryParams = querystring.stringify({
     client_id: CLIENT_ID,
@@ -69,7 +68,7 @@ app.get("/callback", (req, res) => {
   const code = req.query.code || null;
 
   axios({
-    methode: "post",
+    method: "post",
     url: "https://accounts.spotify.com/api/token",
     data: querystring.stringify({
       grant_type: "authorization_code",
@@ -85,15 +84,23 @@ app.get("/callback", (req, res) => {
   })
     .then(response => {
       if (response.status === 200) {
-        const { access_token, token_type } = response.data;
+        const { access_token, refresh_token } = response.data;
 
-        axios.get("https://api.spotify.com/v1/me", {
-          headers: {
-            Authorization: `${token_type} ${access_token}`
-          }
+        const queryParams = querystring.stringify({
+          access_token,
+          refresh_token
         });
+
+        // redirect to react app
+        res.redirect(`http://localhost:3000/?${queryParams}`);
+
+        // pass along tokens in query params
       } else {
-        res.send(`<pre>${JSON.stringify(response.data, null, 2)}</pre>`);
+        res.redirect(
+          `/?${querystring.stringify({
+            error: "invalid_token"
+          })}`
+        );
       }
     })
     .catch(error => {
