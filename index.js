@@ -1,6 +1,5 @@
 require("dotenv").config();
 
-// init project
 const express = require("express");
 const querystring = require("querystring");
 const axios = require("axios");
@@ -11,21 +10,6 @@ const port = 8888;
 const CLIENT_ID = process.env.CLIENT_ID;
 const CLIENT_SECRET = process.env.CLIENT_SECRET;
 const REDIRECT_URI = process.env.REDIRECT_URI;
-
-console.log(process.env.CLIENT_ID);
-
-// app.get("/", (req, res) => {
-//   res.send("hello!");
-// });
-
-app.get("/", (req, res) => {
-  const data = {
-    name: "Dan",
-    isAwesome: true
-  };
-
-  res.json(data);
-});
 
 /**
  * Generates a random string containing numbers and letters
@@ -48,7 +32,9 @@ app.get("/login", (req, res) => {
   const state = generateRandomString(16);
   res.cookie(stateKey, state);
 
-  const scope = "user-read-private user-read-email";
+  const scope = ["user-read-private", "user-read-email", "user-top-read"].join(
+    " "
+  );
 
   const queryParams = querystring.stringify({
     client_id: CLIENT_ID,
@@ -59,9 +45,6 @@ app.get("/login", (req, res) => {
   });
 
   res.redirect(`https://accounts.spotify.com/authorize?${queryParams}`);
-  //   res.redirect(
-  //     `https://accounts.spotify.com/authorize?client_id=${CLIENT_ID}&response_type=code&redirect_uri=${REDIRECT_URI}`
-  //   );
 });
 
 app.get("/callback", (req, res) => {
@@ -92,16 +75,9 @@ app.get("/callback", (req, res) => {
           expires_in
         });
 
-        // redirect to react app
         res.redirect(`http://localhost:3000/?${queryParams}`);
-
-        // pass along tokens in query params
       } else {
-        res.redirect(
-          `/?${querystring.stringify({
-            error: "invalid_token"
-          })}`
-        );
+        res.redirect(`/?${querystring.stringify({ error: "invalid_token" })}`);
       }
     })
     .catch(error => {
