@@ -1,7 +1,7 @@
 import { css } from "styled-components/macro";
 
 const fonts = css`
-  @font-face {
+  /* @font-face {
     font-family: "Circular Std";
     src: url("../fonts/CircularStd-Book.woff2") format("woff2"),
       url("../fonts/CircularStd-Book.woff") format("woff");
@@ -23,7 +23,7 @@ const fonts = css`
       url("../fonts/CircularStd-Black.woff") format("woff");
     font-weight: 900;
     font-style: normal;
-  }
+  } */
 `;
 
 export default fonts;

@@ -1,11 +1,16 @@
-import { useState, useEffect } from 'react';
-import { getTopArtists } from '../spotify';
-import { catchErrors } from '../utils';
-import { ArtistsGrid, SectionWrapper, TimeRangeButtons } from '../components';
+import { useState, useEffect } from "react";
+import { getTopArtists } from "../spotify";
+import { catchErrors } from "../utils";
+import {
+  ArtistsGrid,
+  SectionWrapper,
+  TimeRangeButtons,
+  Loader
+} from "../components";
 
 const TopArtists = () => {
   const [topArtists, setTopArtists] = useState(null);
-  const [activeRange, setActiveRange] = useState('short');
+  const [activeRange, setActiveRange] = useState("short");
 
   useEffect(() => {
     const fetchData = async () => {
@@ -24,8 +29,10 @@ const TopArtists = () => {
           setActiveRange={setActiveRange}
         />
 
-        {topArtists && topArtists.items && (
+        {topArtists && topArtists.items ? (
           <ArtistsGrid artists={topArtists.items} />
+        ) : (
+          <Loader />
         )}
       </SectionWrapper>
     </main>
